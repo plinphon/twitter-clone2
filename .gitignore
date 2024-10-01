@@ -1,0 +1,31 @@
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+
+# Ignore environment files
+.env
+venv/
+*.env
+
+# Ignore large data files or database files
+data/
+*.pg_wal
+*.DS_Store
+*.log
+# Ignore VSCode and other editor-specific settings
+.vscode/
+*.code-workspace
+
+# Ignore temporary files
+*.tmp
+*.log
+
+# Ignore IDE config files
+.idea/
+.DS_Store
+
+# Ignore compiled files and libraries
+*.so
+*.dll
+*.dylib
+*.class

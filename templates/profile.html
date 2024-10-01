@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user.username }}'s Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ user.username }}'s Profile</h1>
+
+        <!-- Home Button -->
+        <div class="home-button">
+            <a href="{{ url_for('index') }}" class="btn home-btn">Home</a>
+        </div>
+
+        {% if user.username == current_username %}
+            <p>This is your profile.</p>
+        {% else %}
+            <div class="follow-button">
+                {% if followed %}
+                    <form action="{{ url_for('unfollow', username=user.username) }}" method="POST">
+                        <button type="submit" class="btn unfollow-btn">Unfollow</button>
+                    </form>
+                {% else %}
+                    <form action="{{ url_for('follow', username=user.username) }}" method="POST">
+                        <button type="submit" class="btn follow-btn">Follow</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <h2>Posts by {{ user.username }}</h2>
+        <ul class="posts-list">
+            <!-- Posts will be dynamically inserted here by app.js -->
+        </ul>
+    </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+    <script>
+        // Fetch user posts on page load
+        function fetchUserPosts(username) {
+            fetch(`/api/posts/${username}`)  // Fetch posts for the specific user
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const postsList = document.querySelector('.posts-list');
+                    postsList.innerHTML = ''; // Clear existing posts
+
+                    data.forEach(post => {
+                        const postItem = document.createElement('li');
+                        postItem.className = 'post-item';
+                        postItem.id = `post-${post.id}`;
+                        postItem.innerHTML = `
+                            <div class="post-header">
+                                <span class="post-username">${post.username}</span>
+                                <span class="post-time">${post.post_time}</span>
+                            </div>
+                            <div class="post-content">${post.text}</div>
+                            <div class="like-count">${post.likes} likes</div>
+                        `;
+                        postsList.appendChild(postItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching user posts:', error); // Log the fetch error
+                });
+        }
+
+        // Call fetchUserPosts with the username when the profile page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = "{{ user.username }}"; // Get the username from the server-side
+            fetchUserPosts(username); // Fetch posts for this user
+        });
+    </script>
+</body>
+</html>

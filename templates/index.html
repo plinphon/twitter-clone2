@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tvitter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Tvitter</h1>
+
+        <!-- Flash Messages -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Profile Link -->
+        <form action="{{ url_for('search') }}" method="GET">
+            <input type="hidden" name="q" value="{{ current_username }}">
+            <button type="submit">Your Profile</button>
+        </form>
+
+        <!-- Search Box -->
+        <form method="GET" action="{{ url_for('search') }}">
+            <input type="text" name="q" placeholder="Search for people..." required>
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Post Box -->
+        <form method="POST" action="{{ url_for('post') }}">
+            <textarea name="content" placeholder="What's happening?" required></textarea>
+            <button type="submit">Post</button>
+        </form>
+
+        <!-- Authentication Links -->
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+
+        <!-- Posts Section -->
+        <section class="posts-section">
+            <h2>Recent Posts</h2>
+            <div id="post-container">
+                <ul class="posts-list">
+                    <!-- Posts will be dynamically inserted here by app.js -->
+                </ul>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
